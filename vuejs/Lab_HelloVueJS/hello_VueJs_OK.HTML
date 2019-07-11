@@ -26,20 +26,22 @@
 
     <div id="app2">
         <span v-bind:title="message">
-            請將滑鼠移到本段文字上方
+            {{ content }}
         </span>
     </div>
-
+    
     <div id="app3">
         <span v-if="seen">Now you see me</span>
+        <hr>
+        <button v-on:click="show">Try Me!</button>
     </div>    
 
     <div id="app4">
-        <ol>
+        <ul>
             <li v-for="todoItem in todoList">
-                {{ todoItem.text }}
+                {{ todoItem.id }}. {{ todoItem.text }}
             </li>
-        </ol>
+        </ul>
     </div>    
 
 <script>
@@ -47,7 +49,7 @@
     var app1 = new Vue({
         el: "#app1",
         data: {
-            message: 'Hello Vue!'
+            message: "Hello Yj! That's for fun"
         },
         methods: {
             reverseMessage: function () {
@@ -60,6 +62,7 @@
     var app2 = new Vue({
         el: '#app2',
         data: {
+            content: '請將滑鼠移到本段文字上方',
             message: '載入時間: ' + new Date().toLocaleString()
         }
     });
@@ -68,7 +71,12 @@
     var app3 = new Vue({
         el: '#app3',
         data: {
-            seen: true
+            seen: false
+        },
+        methods: {
+            show: function () {
+                this.seen = (this.seen)? false : true;
+            }
         }
     });
 
@@ -77,9 +85,9 @@
         el: '#app4',
         data: {
             todoList: [
-                { text: 'Learn JavaScript' },
-                { text: 'Learn Vue' },
-                { text: 'Build something awesome' }
+                { id: 1, text: 'Learn JavaScript' },
+                { id: 2, text: 'Learn Vue' },
+                { id: 3, text: 'Build something awesome' }
             ]
         }
     });

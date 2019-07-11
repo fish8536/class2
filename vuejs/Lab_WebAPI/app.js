@@ -36,7 +36,7 @@ console.log("「Ctrl + C」可結束伺服器程式.");
 // 建立資料庫連線
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-	host : '127.0.0.1',
+	host : 'localhost',
 	user : 'root',
 	password : '',
 	database : 'labDB'
@@ -54,45 +54,44 @@ connection.connect(function(err) {
 
 app.get("/home/news", function (request, response) {
 
-	connection.query('select * from news', 
+	connection.query('select * from news',
 		'',
 		function(err, rows) {
 			if (err)	{
 				console.log(JSON.stringify(err));
 				return;
 			}
-			
+
 			response.send(JSON.stringify(rows));
 		}
 	);
-    
+
 })
 
 
 app.post("/home/news", function (request, response) {
 
 	connection.query(
-		"insert into news set title = ?, ymd = ? ", 
+		"insert into news set title = ?, ymd = ? ",
 			[
-				request.body.title, 
+				request.body.title,
 				request.body.ymd
 			]);
 	response.send("row inserted.");
-    
+
 })
 
 
 app.put("/home/news", function (request, response) {
-
 	connection.query(
-		"update news set title = ?, ymd = ? where newsId = " 
-		    + request.body.newsId, 
+		"update news set title = ?, ymd = ? where newsId = "
+		    + request.body.newsId,
 			[
-				request.body.title, 
+				request.body.title,
 				request.body.ymd
 			]);
 	response.send("row updated.");
-    
+
 })
 
 
@@ -103,6 +102,6 @@ app.delete("/home/news", function (request, response) {
 			[]
 		);
 	response.send("row deleted.");
-    
+
 })
 
