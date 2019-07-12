@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+</head>
+<body>
+
+    <div id="lab">
+        First Name: <input type="text" v-model='firstName' > <br>
+        Last Name: <input type="text" v-model='lastName' > <hr>
+        Full Name: {{ fullName }}
+    </div>
+    <hr>
+    <div id="lab2">
+        總次數: {{ totalCount | leadzero(sublen) }} <br>
+        <count-button v-bind:init-count="0" v-bind:init-name="'補零位數:'" v-on:cclick="sublen++"></count-button>
+        <br>
+        <count-button v-bind:init-count="0" v-bind:init-name="'點按次數:'" v-on:cclick="totalCount++"></count-button>
+    </div>
+
+    <script type="text/x-template" id="btn-template">
+        <button v-on:click="doClick(); $emit('cclick')">
+            {{ name }} {{ count }}
+        </button>
+    </script>
+
+    <script>
+        var labApp = new Vue({
+            el: "#lab",
+            data: {
+                firstName: "",
+                lastName: ""
+            },
+            computed: {
+                fullName() {
+                    return this.firstName + " " + this.lastName;
+                }
+            }
+        });
+
+        Vue.filter('leadzero', function (value, len) {
+            return (value + Math.pow(10 ,len)).toString().substr(1, len);
+        });
+
+        Vue.component('count-button', {
+            props: ['initCount', 'initName'],
+            data: function () {
+                return {
+                    count: this.initCount,
+                    name: this.initName,
+                }
+            },
+            template: '#btn-template',
+            methods: {
+                doClick: function () {
+                    this.count++;
+
+                }
+            }
+        })
+
+        var labApp = new Vue({
+            el: '#lab2',
+            data: {
+                sublen: 1,
+                totalCount: 0,
+                btnNameList: [
+                    { count: 0, name: '補零位數' },
+                    { count: 0, name: '點按次數' },
+                ],
+            }
+        })
+
+
+    </script>
+
+</body>
+</html>
