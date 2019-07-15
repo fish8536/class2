@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Lab</title>
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.css"
+        />
+        <style>
+            body {
+                background-color: #abc;
+            }
+            *,
+            h1,
+            button {
+                font-family: sans-serif;
+            }
+            .fade-enter-active,
+            .fade-leave-active {
+                transition: opacity 0.5s;
+            }
+            .fade-enter,
+            .fade-leave-active {
+                opacity: 0;
+            }
+            .tasks {
+                width: 100%;
+                max-width: 45rem;
+                padding: 1em;
+                margin: 1em auto;
+                overflow: auto;
+                background-color: #fff;
+                box-shadow: 0px 0.25rem 1rem rgba(0, 0, 0, 0.25);
+            }
+            .tasks__item__toggle {
+                cursor: pointer;
+                width: 100%;
+                text-align: left;
+                padding: 0.85em 2.25em 0.85em 1em;
+                background-color: rgba(0, 0, 0, 0.05);
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            .tasks__item__toggle:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+                border-color: rgba(0, 0, 0, 0.15);
+            }
+            .completed {
+                text-decoration: line-through;
+                background-color: rgba(0, 128, 0, 0.15);
+                border-color: rgba(0, 128, 0, 0.2);
+            }
+            .completed:hover {
+                background-color: rgba(0, 128, 0, 0.25);
+                border-color: rgba(0, 128, 0, 0.3);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container" id="app">
+            <task-list :tasks="tasks"></task-list>
+        </div>
+
+        <template id="task-list">
+            <section class="tasks">
+                <h1>
+                    Todo List
+                    <transition name="fade">
+                        <span v-if="incomplete" class="badge badge-primary">{{ incomplete }}</span>
+                    </transition>
+                </h1>
+                <div class="input-group">
+                    <input
+                        type="text"
+                        class="form-control"
+                        v-model="newTask"
+                        @keyup.enter="addTask"
+                        placeholder="New task"
+                    />
+                    <div class="input-group-append">
+                        <button @click="addTask" class="btn btn-outline-secondary">
+                            <i class="fa fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <div class="btn-group " role="group">
+                        <button
+                            class="btn btn-warning btn-sm"
+                            @click="clearCompleted"
+                        >
+                            <i class="fa fa-check"></i> Clear Completed
+                        </button>
+                        <button class="btn btn-danger btn-sm" @click="clearAll">
+                            <i class="fa fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <transition-group
+                    name="fade"
+                    tag="ul"
+                    class="list-group"
+                >
+                    <task-item
+                        v-for="(task, idx) in tasks"
+                        @remove="removeTask(idx)"
+                        @complete="completeTask(idx)"
+                        :item="task"
+                        :key="idx"
+                    ></task-item>
+                </transition-group>
+            </section>
+        </template>
+
+        <template id="task-item">
+            <li class="list-group-item d-flex justify-content-between" :class="className">
+                <button class="btn tasks__item__toggle"  @click.self="$emit('complete')">
+                    {{ item.title }}
+                </button>
+                <button
+                    class="btn"
+                    @click="$emit('remove')"
+                >
+                    <i class="fa fa-times"></i>
+                </button>
+            </li>
+        </template>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script
+            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/js/all.js"
+            integrity="sha256-S1WJaJce5DQaJRMMO9igZPd6WRgObuRlQXE8i7yKOd8="
+            crossorigin="anonymous"
+        ></script>
+
+        <script>
+            Vue.component("task-list", {
+                template: "#task-list",
+                props: {
+                    tasks: { default: [] }
+                },
+                data() {
+                    return {
+                        newTask: ""
+                    };
+                },
+                computed: {
+                    incomplete() {
+                        return this.tasks.filter(this.inProgress).length;
+                    }
+                },
+                methods: {
+                    addTask() {
+                        if (this.newTask) {
+                            this.tasks.push({
+                                title: this.newTask,
+                                completed: false
+                            });
+                            this.newTask = "";
+                        }
+                    },
+                    completeTask(index) {
+                        this.tasks[index].completed = !this.tasks[index].completed;
+                    },
+                    removeTask(index) {
+                        this.tasks.splice(index, 1);
+                    },
+                    clearCompleted() {
+                        this.tasks = this.tasks.filter(this.inProgress);
+                    },
+                    clearAll() {
+                        this.tasks = [];
+                    },
+
+                    inProgress(task) {
+                        return !this.isCompleted(task);
+                    },
+                    isCompleted(task) {
+                        return task.completed;
+                    }
+                }
+            });
+
+            Vue.component("task-item", {
+                template: "#task-item",
+                props: ["item"],
+                computed: {
+                    className() {
+                        let classes = ["completed"];
+                        if (this.item.completed) {
+                            return classes.join("");
+                        }
+                    },
+                }
+            });
+
+            new Vue({
+                el: "#app",
+                data: {
+                    tasks: [
+                        {
+                            title: "Make todo list",
+                            completed: true
+                        },
+                        {
+                            title: "Go skydiving",
+                            completed: false
+                        }
+                    ]
+                }
+            });
+        </script>
+    </body>
+</html>
